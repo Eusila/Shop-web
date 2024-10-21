@@ -1,0 +1,15 @@
+.form{
+   
+    width: 400px;
+    height: 400px;
+    background-color: white;
+    margin: auto;
+}
+.form-content{
+  width: 200px;
+  height: 100px;
+  padding: 80px;
+}
+.inputs{
+    gap: 30px;
+}
