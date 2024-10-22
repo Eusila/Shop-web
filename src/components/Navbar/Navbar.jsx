@@ -10,6 +10,7 @@ function Navbar() {
             <h1>CH$ Shop</h1>
             <ul className='main-ul'>
              <li><Link to={'products'} >Products</Link></li> 
+             <li><Link to={'cart'}><img src="./cart.svg " alt="Cart" /></Link></li>
              <li><Link to={'myaccount'}>My Account</Link></li>
             </ul>
 

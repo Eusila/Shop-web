@@ -5,13 +5,13 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    width: 1280px;
+    width: 1000px;
     height: 400px;
-    
+    zoom: 1.5;
 
     margin: auto;
     margin-top: 50px;
-    zoom: 1.5;
+    
   
 
 }
@@ -28,7 +28,7 @@
     width: 800px;
     height: 300px;
    text-align: center;
-   background-color: white;
+  
     margin: auto;
     h3{
         color: #000;
@@ -39,17 +39,16 @@
 .ac{
     display: flex;
     justify-content: space-evenly;
-    width: 800px;
+    flex-direction: row;
+  
 
     h5{
-        color: #000;
+        color:white;
         
     }
     
 }
-.img{
-    width: 500px;
-    height: auto;
-    
 
-}
+
+
+

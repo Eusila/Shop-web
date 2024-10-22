@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { fetchLimitedProducts, deleteProduct } from '../services/Api'; 
-import { Link } from 'react-router-dom'
-
-
-
+import React, { useState, useEffect } from "react";
+import { fetchLimitedProducts, deleteProduct } from "../services/Api";
+import { Link } from "react-router-dom";
+import { CartState } from "../context/Context";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const [sortCriteria, setSortCriteria] = useState('default');
-  const [limit, setLimit] = useState(10); 
-  const [loading, setLoading] = useState(true); // Loading state
+  const [sortCriteria, setSortCriteria] = useState("default");
+  const [limit, setLimit] = useState(10);
+  const [loading, setLoading] = useState(true);
+  const {
+    state: { cart },
+    dispatch,
+  } = CartState();
   
 
   useEffect(() => {
@@ -18,20 +20,20 @@ const Products = () => {
         const data = await fetchLimitedProducts(limit);
         setProducts(data);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error("Error fetching products:", error);
       } finally {
         setLoading(false); // Set loading to false after fetching
       }
     };
 
     fetchProducts();
-  }, [limit]); 
+  }, [limit]);
 
   const sortProducts = (criteria) => {
     let sortedProducts = [...products];
-    if (criteria === 'price-asc') {
+    if (criteria === "price-asc") {
       sortedProducts.sort((a, b) => a.price - b.price);
-    } else if (criteria === 'price-desc') {
+    } else if (criteria === "price-desc") {
       sortedProducts.sort((a, b) => b.price - a.price);
     }
     setProducts(sortedProducts);
@@ -44,27 +46,26 @@ const Products = () => {
   };
 
   const handleLimitChange = (e) => {
-    setLimit(parseInt(e.target.value, 10)); 
+    setLimit(parseInt(e.target.value, 10));
   };
 
   const handleDelete = async (id) => {
     try {
       await deleteProduct(id);
-      setProducts(products.filter(product => product.id !== id));
+      setProducts(products.filter((product) => product.id !== id));
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   return (
     <div style={styles.productList}>
-      <h2>Our Products</h2>
-     
-      
+      <h2>All Products</h2>
+
       <div style={styles.controlContainer}>
         <label htmlFor="sort">Sort by: </label>
         <select id="sort" value={sortCriteria} onChange={handleSortChange}>
@@ -73,7 +74,9 @@ const Products = () => {
           <option value="price-desc">Price: High to Low</option>
         </select>
 
-        <label htmlFor="limit" style={{ marginLeft: '20px' }}>Show: </label>
+        <label htmlFor="limit" style={{ marginLeft: "20px" }}>
+          Show:{" "}
+        </label>
         <select id="limit" value={limit} onChange={handleLimitChange}>
           <option value="5">5 Products</option>
           <option value="10">10 Products</option>
@@ -82,25 +85,58 @@ const Products = () => {
       </div>
 
       <div style={styles.productGrid}>
-        {products.map(product => (
+        {products.map((product) => (
           <div key={product.id} style={styles.productCard}>
             <Link to={`/product/${product.id}`} style={styles.productLink}>
-              <img src={product.image} alt={product.title} style={styles.productImage} />
-             <div className="style detail"> <h3 style={styles.productTitle}>{product.title}</h3>
-             <p style={styles.productDescription}>{product.description.substring(0, 100)}...</p></div>
+              <img
+                src={product.image}
+                alt={product.title}
+                style={styles.productImage}
+              />
+              <div className="style detail">
+                {" "}
+                <h3 style={styles.productTitle}>{product.title}</h3>
+                <p style={styles.productDescription}>
+                  {product.description.substring(0, 100)}...
+                </p>
+              </div>
               <strong style={styles.productPrice}>${product.price}</strong>
-              
             </Link>
 
-            <button 
-              style={styles.deleteButton} 
+            <button
+              style={styles.deleteButton}
               onClick={() => handleDelete(product.id)}
             >
               Delete
             </button>
-   
+            <div>
+              {cart.some((p) => p.id === product.id) ? (
+                <button
+                  onClick={() => {
+                    dispatch({
+                      type: "REMOVE_FROM_CART",
+                      payload: product,
+                    });
+                  }}
+                  style={styles.deleteButton}
+                >
+                  Remove from Cart
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    dispatch({
+                      type: "ADD_TO_CART",
+                      payload: product,
+                    });
+                  }}
+                  style={styles.addButton}
+                >
+                  Add to Cart
+                </button>
+              )}
+            </div>
           </div>
-          
         ))}
       </div>
     </div>
@@ -109,59 +145,68 @@ const Products = () => {
 
 const styles = {
   productList: {
-    padding: '20px',
+    padding: "20px",
   },
+
   controlContainer: {
-    marginBottom: '20px',
+    marginBottom: "20px",
   },
   productGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, minmax(200px, 1fr))',
-    gap: '20px',
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(200px, 1fr))",
+    gap: "20px",
   },
   productCard: {
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    padding: '10px',
-    textAlign: 'center',
-    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-    backgroundColor: 'white',
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    padding: "10px",
+    textAlign: "center",
+    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+    backgroundColor: "white",
   },
-  
+
   productImage: {
-    width: '100%',
-    height: '200px',
-    objectFit: 'contain',
+    width: "100%",
+    height: "200px",
+    objectFit: "contain",
   },
   productTitle: {
-    fontSize: '18px',
-    margin: '10px 0',
-    color: 'black'
-   
+    fontSize: "19px",
+    margin: "10px 0",
+    color: "black",
   },
   productDescription: {
-    fontSize: '14px',
-    color: '#555',
+    fontSize: "14px",
+    color: "#555",
   },
   productPrice: {
-    fontSize: '16px',
-    color: '#000',
-    fontWeight: 'bold',
+    fontSize: "16px",
+    color: "#000",
+    fontWeight: "bold",
   },
   productLink: {
-    textDecoration: 'none',
-    color: 'inherit',
+    textDecoration: "none",
+    color: "inherit",
   },
   deleteButton: {
-    backgroundColor: 'rgb(133, 45, 45)',
-    color: 'white',
-    border: 'none',
-    padding: '8px 16px',
-    cursor: 'pointer',
-    marginTop: '10px',
-    borderRadius: '4px',
+    backgroundColor: "rgb(133, 45, 45)",
+    color: "white",
+    border: "none",
+    padding: "8px 16px",
+    cursor: "pointer",
+    marginTop: "10px",
+    borderRadius: "4px",
+  },
+  addButton: {
+    backgroundColor: "dark blue",
+    color: "white",
+    border: "none",
+    padding: "8px 16px",
+    cursor: "pointer",
+    marginTop: "10px",
+    borderRadius: "4px",
+    gap: "5px",
   },
 };
-
 
 export default Products;

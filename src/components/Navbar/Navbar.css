@@ -13,6 +13,11 @@
     justify-content: space-between;
     padding: 10px;
     margin-left: 20px;
+    h1{
+      color:white;
+      font-weight: bolder;
+      font-size: extra x-large;
+    }
 }
   
   .main-ul{
@@ -29,7 +34,8 @@
   
   .main-ul li a{
   text-decoration: none;
-  color: white;
+  color: black;
+  font-weight: bolder;
   }
   
   
@@ -40,6 +46,9 @@
   .section{
     width: 400px;
     margin: auto;
+  background-color: #13265c ;
+  margin-top: 1px;
+
   
     display: flex;
     justify-content: space-evenly;
